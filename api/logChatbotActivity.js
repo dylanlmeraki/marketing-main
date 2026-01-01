@@ -1,25 +1,35 @@
-import { getBase44Service } from "./_base44.js";
+import { sendEmail } from "./_email.js"; 
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).json({ ok: false });
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   try {
-    const base44 = getBase44Service();
-    const payload = req.body || {};
+    const toTeam = process.env.CONTACT_INBOX;
+    if (!toTeam) return res.status(500).json({ error: "Missing CONTACT_INBOX env var" });
 
-    // If you have a Base44 function, call it; otherwise email yourself the log
-    try {
-      await base44.functions.logChatbotActivity(payload);
-    } catch {
-      await base44.integrations.Core.SendEmail({
-        to: process.env.CONTACT_INBOX,
-        subject: `Chatbot log: ${payload.sessionId || "unknown"}`,
-        body: JSON.stringify(payload, null, 2),
-      });
-    }
+    const payload = req.body || {};
+    const subject = `Chatbot log${payload?.urgentFlag ? " (URGENT)" : ""} - ${payload?.sessionId || ""}`;
+
+    await sendEmail({
+      to: toTeam,
+      subject,
+      text: JSON.stringify(payload, null, 2),
+      html: `<pre style="white-space:pre-wrap">${escapeHtml(JSON.stringify(payload, null, 2))}</pre>`,
+    });
 
     return res.status(200).json({ ok: true });
   } catch (e) {
-    return res.status(500).json({ ok: false, error: e?.message || "Server error" });
+    console.error("logChatbotActivity error:", e);
+    return res.status(500).json({ error: "Failed to log chatbot activity" });
   }
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, (m) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
+  }[m]));
 }
