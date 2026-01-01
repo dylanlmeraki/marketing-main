@@ -273,12 +273,12 @@ ${formData.message}${filesSection}`;
         <a href="https://pacificengineeringsf.com/ClientAuth" class="button">Access Your Client Portal</a>
       </div>
 
-      <p style="margin-top: 30px;">If you have any urgent questions, please call us at <strong>(415)-419-6079</strong>.</p>
+      <p style="margin-top: 30px;">If you have any urgent questions, please call us at <strong>(415)-689 4428 </strong>.</p>
       
       <p style="margin-top: 20px;">Best regards,<br><strong>Pacific Engineering Team</strong></p>
     </div>
     <div class="footer">
-      <p>Pacific Engineering & Construction Inc.<br>470 3rd St., San Francisco, CA 94107<br>(415)-419-6079 | dylanl.peci@gmail.com</p>
+      <p>Pacific Engineering & Construction Inc.<br>470 3rd St., San Francisco, CA 94107<br>(415)-419-6079 | amwaldman@sbcglobal.net</p>
     </div>
   </div>
 </body>
@@ -620,8 +620,8 @@ ${formData.message}${filesSection}`;
                         </div>
                         <div>
                           <h3 className="font-bold text-slate-900 mb-1 uppercase tracking-wide">Email</h3>
-                          <a href="mailto:dylanl.peci@gmail.com" className="text-blue-600 hover:text-blue-800 text-lg font-bold break-all">
-                            dylanl.peci@gmail.com
+                          <a href="mailto:amwaldman@sbcglobal.net" className="text-blue-600 hover:text-blue-800 text-lg font-bold break-all">
+                            amwaldman@sbcglobal.net
                           </a>
                           <p className="text-slate-500 text-sm mt-1 font-medium">We respond within 24 hours</p>
                         </div>
