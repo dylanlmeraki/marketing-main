@@ -3,7 +3,7 @@ import ChatBot from "@/components/ChatBot.jsx";
 import NotificationCenter from "@/components/notifications/NotificationCenter";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
-export default function FloatingButtons() {
+export default function FloatingButtons({ user }) {
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   return (
@@ -14,19 +14,21 @@ export default function FloatingButtons() {
           <ChatBotWrapper onOpenChange={setIsChatOpen} />
         </div>
       </ErrorBoundary>
-    
-      {/* Notification Center, hidden when Chat Bot is open */}
-      {!isChatOpen && (
-        <ErrorBoundary>
-          <div>
-            <NotificationCenter />
-          </div>
-        </ErrorBoundary>
+
+      {/* Floating Notification Button */}
+      {user && (
+        <div className="fixed bottom-6 z-50 flex items-center gap-3 transition-all duration-300"
+             style={{ right: isChatOpen ? 'calc(24rem + 1.5rem + 1.5rem)' : '6.5rem' }}>
+          <ErrorBoundary>
+            <div className="relative">
+              <NotificationCenter user={user} />
+            </div>
+          </ErrorBoundary>
+        </div>
       )}
     </>
   );
-} 
-
+}
 
 function ChatBotWrapper({ onOpenChange }) {
   return <ChatBotWithCallback onOpenChange={onOpenChange} />;
