@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { apiClient } from "@/components/utils/apiClient";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -112,7 +112,7 @@ export default function Consultation() {
     
     for (const file of files) {
       try {
-        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        const { file_url } = await apiClient.integrations.Core.UploadFile({ file });
         setUploadedFiles(prev => [...prev, { name: file.name, url: file_url }]);
       } catch (error) {
         console.error("Error uploading file:", error);
