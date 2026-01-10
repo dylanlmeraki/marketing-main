@@ -26,12 +26,24 @@ export default function Home() {
         </div>
 
         {/* Animated grid overlay (above cover image, below content) */}
-        <div className="absolute inset-0 opacity-50 pointer-events-none">
-          <AnimatedGridBackground />
-        </div>
-        
-        {/* Rigid Grid Overlay */}
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/grid-me.png')] opacity-20 pointer-events-none"></div>
+        <AnimatedGridBackground 
+          baseOpacity={0.6}
+          triggerInterval={300}
+          animationDuration={2500}
+          zIndex={2}
+          className="mix-blend-screen"
+        />
+        <AnimatedGridBackground 
+          gridSize={80}
+          animationDuration={4200}
+          triggerInterval={650}
+          offsetX={12}
+          offsetY={8}
+          baseOpacity={0.45}
+          zIndex={3}
+          movingOffset
+          className="mix-blend-screen"
+        />
 
         <div className="text-center relative z-10 max-w-7xl px-4 w-full">
           <AnimatedSection direction="up" duration={0.8} className="bg-slate-900/80 mx-auto opacity-100 rounded-md backdrop-blur-sm max-w-6xl shadow-2xl border-t-4 border-blue-600">

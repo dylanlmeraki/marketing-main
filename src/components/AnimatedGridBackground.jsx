@@ -1,244 +1,218 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import React, { useEffect, useRef, useState } from "react";
 
-/**
- * AnimatedGridBackground
- * - Absolute positioned background meant to sit inside a `relative` hero container.
- * - Use `className="absolute inset-0 opacity-50 pointer-events-none"` on the wrapper where you mount it
- *   if you want 50% opacity and to keep it from blocking clicks.
- */
-
-const DEFAULT_COLORS = [
-  "from-blue-500/80 to-blue-600/80",
-  "from-cyan-500/80 to-cyan-600/80",
-  "from-slate-400/80 to-slate-500/80",
-  "from-blue-400/80 to-cyan-500/80",
-  "from-cyan-400/80 to-blue-500/80",
-];
-
-function getRandomFrom(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-export default function AnimatedGridBackground({
-  rows = 12,
-  cols = 20,
-  curvedPercentage = 5,
-  animationInterval = 800,
-  maxActiveSquares = 8,
-  backgroundRows = 24,
-  backgroundCols = 40,
-  backgroundInterval = 2400,
-  maxBackgroundActive = 3,
+const AnimatedGridBackground = ({
+  gridSize = 40,
+  animationDuration = 2000,
+  triggerInterval = 400,
+  offsetX = 0,
+  offsetY = 0,
+  baseOpacity = 1,
+  zIndex = 0,
+  movingOffset = false,
   className = "",
-}) {
-  const colors = useMemo(() => DEFAULT_COLORS, []);
+}) => {
+  const canvasRef = useRef(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const cellsRef = useRef([]);
+  const animationFrameRef = useRef();
+  const lastTriggerRef = useRef(0);
+  const startTimeRef = useRef(null);
 
-  const [squares, setSquares] = useState([]);
-  const [activeSquares, setActiveSquares] = useState(() => new Set());
-
-  const [backgroundSquares, setBackgroundSquares] = useState([]);
-  const [activeBackgroundSquares, setActiveBackgroundSquares] = useState(() => new Set());
+  const GRID_SIZE = gridSize;
+  const CELL_PADDING = 2;
+  const ANIMATION_DURATION = animationDuration;
+  const TRIGGER_INTERVAL = triggerInterval;
+  const CORNER_RADIUS_CHANCE = 0.05;
 
   useEffect(() => {
-    const totalSquares = rows * cols;
-    const curvedCount = Math.floor((totalSquares * curvedPercentage) / 100);
-    const curvedIndices = new Set();
+    const updateDimensions = () => {
+      if (!canvasRef.current) return;
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      setDimensions({ width, height });
+      canvasRef.current.width = width;
+      canvasRef.current.height = height;
+    };
 
-    while (curvedIndices.size < curvedCount) {
-      curvedIndices.add(Math.floor(Math.random() * totalSquares));
-    }
+    updateDimensions();
+    window.addEventListener("resize", updateDimensions);
 
-    const initialSquares = [];
-    let index = 0;
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < cols; col++) {
-        initialSquares.push({
-          id: `fg-${row}-${col}`,
-          row,
-          col,
-          isCurved: curvedIndices.has(index),
-          color: getRandomFrom(colors),
-        });
-        index++;
-      }
-    }
-    setSquares(initialSquares);
+    return () => window.removeEventListener("resize", updateDimensions);
+  }, []);
 
-    const initialBackgroundSquares = [];
-    for (let row = 0; row < backgroundRows; row++) {
-      for (let col = 0; col < backgroundCols; col++) {
-        initialBackgroundSquares.push({
-          id: `bg-${row}-${col}`,
-          row,
-          col,
-          color: getRandomFrom(colors),
-        });
-      }
-    }
-    setBackgroundSquares(initialBackgroundSquares);
-  }, [rows, cols, curvedPercentage, backgroundRows, backgroundCols, colors]);
-
-  // Foreground grid animation
   useEffect(() => {
-    const interval = setInterval(() => {
-      const inactiveSquares = squares.filter((sq) => !activeSquares.has(sq.id));
-      const inactiveCurved = inactiveSquares.filter((sq) => sq.isCurved);
-      const inactiveRegular = inactiveSquares.filter((sq) => !sq.isCurved);
+    if (!dimensions.width || !dimensions.height) return;
 
-      const newActiveIds = new Set(activeSquares);
+    const cols = Math.ceil(dimensions.width / GRID_SIZE);
+    const rows = Math.ceil(dimensions.height / GRID_SIZE);
 
-      // Activate regular squares more frequently
-      if (inactiveRegular.length > 0) {
-        const numToActivate = Math.min(
-          Math.floor(Math.random() * 3) + 1,
-          maxActiveSquares - activeSquares.size
-        );
+    cellsRef.current = [];
+    for (let y = 0; y < rows; y += 1) {
+      for (let x = 0; x < cols; x += 1) {
+        cellsRef.current.push({
+          x,
+          y,
+          isAnimating: false,
+          scale: 0,
+          opacity: 0,
+          animationStart: 0,
+        });
+      }
+    }
+  }, [dimensions.width, dimensions.height, GRID_SIZE]);
 
-        for (let i = 0; i < numToActivate; i++) {
-          if (inactiveRegular.length > 0) {
-            const randomIndex = Math.floor(Math.random() * inactiveRegular.length);
-            const selectedSquare = inactiveRegular.splice(randomIndex, 1)[0];
-            if (selectedSquare) newActiveIds.add(selectedSquare.id);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return undefined;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return undefined;
+
+    const drawRoundedRect = (x, y, width, height, radius) => {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    };
+
+    const animate = (timestamp) => {
+      if (startTimeRef.current === null) {
+        startTimeRef.current = timestamp;
+      }
+
+      ctx.clearRect(0, 0, dimensions.width, dimensions.height);
+      if (baseOpacity === 1) {
+        ctx.fillStyle = "hsl(220, 13%, 9%)";
+        ctx.fillRect(0, 0, dimensions.width, dimensions.height);
+      }
+
+      const cols = Math.ceil(dimensions.width / GRID_SIZE);
+      const rows = Math.ceil(dimensions.height / GRID_SIZE);
+
+      let currentOffsetX = offsetX;
+      let currentOffsetY = offsetY;
+
+      if (movingOffset) {
+        const elapsed = (timestamp - startTimeRef.current) / 1000;
+        currentOffsetX = offsetX + Math.sin(elapsed * 0.1) * 20;
+        currentOffsetY = offsetY + Math.cos(elapsed * 0.1) * 20;
+      }
+
+      ctx.strokeStyle = `rgba(100, 150, 200, ${0.08 * baseOpacity})`;
+      ctx.lineWidth = 1;
+
+      for (let x = 0; x <= cols; x += 1) {
+        ctx.beginPath();
+        ctx.moveTo(x * GRID_SIZE + currentOffsetX, 0);
+        ctx.lineTo(x * GRID_SIZE + currentOffsetX, dimensions.height);
+        ctx.stroke();
+      }
+
+      for (let y = 0; y <= rows; y += 1) {
+        ctx.beginPath();
+        ctx.moveTo(0, y * GRID_SIZE + currentOffsetY);
+        ctx.lineTo(dimensions.width, y * GRID_SIZE + currentOffsetY);
+        ctx.stroke();
+      }
+
+      if (timestamp - lastTriggerRef.current > TRIGGER_INTERVAL) {
+        const randomIndex = Math.floor(Math.random() * cellsRef.current.length);
+        const cell = cellsRef.current[randomIndex];
+        if (!cell.isAnimating) {
+          cell.isAnimating = true;
+          cell.animationStart = timestamp;
+        }
+        lastTriggerRef.current = timestamp;
+      }
+
+      cellsRef.current.forEach((cell) => {
+        if (cell.isAnimating) {
+          const elapsed = timestamp - cell.animationStart;
+          const progress = Math.min(elapsed / ANIMATION_DURATION, 1);
+
+          if (progress < 0.5) {
+            cell.scale = progress * 2;
+            cell.opacity = progress * 2;
+          } else {
+            cell.scale = 1 - (progress - 0.5) * 2;
+            cell.opacity = 1 - (progress - 0.5) * 2;
+          }
+
+          if (progress >= 1) {
+            cell.isAnimating = false;
+            cell.scale = 0;
+            cell.opacity = 0;
+          }
+
+          if (cell.scale > 0) {
+            const x = cell.x * GRID_SIZE + CELL_PADDING + currentOffsetX;
+            const y = cell.y * GRID_SIZE + CELL_PADDING + currentOffsetY;
+            const size = GRID_SIZE - CELL_PADDING * 2;
+            const scaledSize = size * cell.scale;
+            const offset = (size - scaledSize) / 2;
+
+            const hasRoundedCorners = Math.random() < CORNER_RADIUS_CHANCE;
+            const cornerRadius = hasRoundedCorners ? scaledSize : 0;
+
+            const hue = 200 + Math.random() * 20;
+            const saturation = 70 + Math.random() * 20;
+            const lightness = 50 + Math.random() * 20;
+
+            ctx.fillStyle = `hsla(${hue}, ${saturation}%, ${lightness}%, ${cell.opacity * 0.9 * baseOpacity})`;
+            ctx.shadowColor = `hsla(${hue}, ${saturation}%, ${lightness}%, ${cell.opacity * baseOpacity})`;
+            ctx.shadowBlur = 15 * cell.opacity * baseOpacity;
+
+            if (hasRoundedCorners) {
+              drawRoundedRect(x + offset, y + offset, scaledSize, scaledSize, cornerRadius);
+              ctx.fill();
+            } else {
+              ctx.fillRect(x + offset, y + offset, scaledSize, scaledSize);
+            }
+
+            ctx.shadowBlur = 0;
           }
         }
+      });
+
+      animationFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    animationFrameRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
       }
-
-      // Activate circles less frequently (30% chance)
-      if (inactiveCurved.length > 0 && Math.random() < 0.3) {
-        const randomIndex = Math.floor(Math.random() * inactiveCurved.length);
-        const selectedCircle = inactiveCurved[randomIndex];
-        if (selectedCircle) newActiveIds.add(selectedCircle.id);
-      }
-
-      setActiveSquares(newActiveIds);
-
-      setTimeout(() => {
-        setActiveSquares((prev) => {
-          const updated = new Set(prev);
-          newActiveIds.forEach((id) => {
-            if (!prev.has(id) || Math.random() > 0.3) updated.delete(id);
-          });
-          return updated;
-        });
-      }, animationInterval);
-    }, animationInterval);
-
-    return () => clearInterval(interval);
-  }, [squares, activeSquares, animationInterval, maxActiveSquares]);
-
-  // Background grid animation (slower, less frequent)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const inactive = backgroundSquares.filter((sq) => !activeBackgroundSquares.has(sq.id));
-      if (inactive.length === 0) return;
-
-      const numToActivate = Math.min(
-        Math.floor(Math.random() * 2) + 1,
-        maxBackgroundActive - activeBackgroundSquares.size
-      );
-
-      const newActiveIds = new Set(activeBackgroundSquares);
-      for (let i = 0; i < numToActivate; i++) {
-        if (inactive.length === 0) break;
-        const randomIndex = Math.floor(Math.random() * inactive.length);
-        const selected = inactive.splice(randomIndex, 1)[0];
-        if (selected) newActiveIds.add(selected.id);
-      }
-
-      setActiveBackgroundSquares(newActiveIds);
-
-      setTimeout(() => {
-        setActiveBackgroundSquares((prev) => {
-          const updated = new Set(prev);
-          newActiveIds.forEach((id) => {
-            if (!prev.has(id) || Math.random() > 0.3) updated.delete(id);
-          });
-          return updated;
-        });
-      }, backgroundInterval);
-    }, backgroundInterval);
-
-    return () => clearInterval(interval);
-  }, [backgroundSquares, activeBackgroundSquares, backgroundInterval, maxBackgroundActive]);
+    };
+  }, [
+    ANIMATION_DURATION,
+    GRID_SIZE,
+    TRIGGER_INTERVAL,
+    baseOpacity,
+    dimensions.height,
+    dimensions.width,
+    movingOffset,
+    offsetX,
+    offsetY,
+  ]);
 
   return (
-    <div className={`absolute inset-0 overflow-hidden ${className}`.trim()} aria-hidden="true">
-      <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/20 via-background to-blue-950/20" />
-
-      {/* Background grid layer - larger, more opaque, slower */}
-      <div
-        className="absolute grid gap-[2px] p-4"
-        style={{
-          gridTemplateColumns: `repeat(${backgroundCols / 2}, 1fr)`,
-          gridTemplateRows: `repeat(${backgroundRows / 2}, 1fr)`,
-          left: "20%",
-          top: "20%",
-          width: "100%",
-          height: "100%",
-        }}
-      >
-        {backgroundSquares.map((square) => {
-          const isActive = activeBackgroundSquares.has(square.id);
-          return (
-            <AnimatePresence key={square.id}>
-              {isActive ? (
-                <motion.div
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 0.9 }}
-                  exit={{ scale: 0, opacity: 0 }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                  className={`w-full h-full bg-gradient-to-br ${square.color} shadow-lg`}
-                />
-              ) : (
-                <div className="w-full h-full border border-cyan-900/20 bg-background/70 rounded-none" />
-              )}
-            </AnimatePresence>
-          );
-        })}
-      </div>
-
-      {/* Foreground grid layer - smaller, varying colors */}
-      <div
-        className="relative w-full h-full grid gap-[1px] p-4"
-        style={{
-          gridTemplateColumns: `repeat(${cols}, 1fr)`,
-          gridTemplateRows: `repeat(${rows}, 1fr)`,
-        }}
-      >
-        {squares.map((square) => {
-          const isActive = activeSquares.has(square.id);
-          return (
-            <div key={square.id} className="relative" style={{ fontFamily: "monospace" }}>
-              <div
-                className={`w-full h-full border border-cyan-900/30 bg-background/50 transition-all duration-200 ${
-                  square.isCurved ? "rounded-full" : "rounded-none"
-                }`}
-              />
-              <AnimatePresence>
-                {isActive && (
-                  <motion.div
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0, opacity: 0 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                    className={`absolute inset-0 bg-gradient-to-br ${square.color} shadow-lg ${
-                      square.isCurved ? "rounded-full" : "rounded-none"
-                    }`}
-                    style={{
-                      boxShadow: square.isCurved
-                        ? "0 0 20px rgba(6, 182, 212, 0.5)"
-                        : "0 0 15px rgba(59, 130, 246, 0.4)",
-                    }}
-                  />
-                )}
-              </AnimatePresence>
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent pointer-events-none" />
-    </div>
+    <canvas
+      ref={canvasRef}
+      className={`absolute inset-0 w-full h-full pointer-events-none ${className}`}
+      style={{
+        background: baseOpacity === 1 ? "hsl(220, 13%, 9%)" : "transparent",
+        zIndex,
+      }}
+    />
   );
-}
+};
+
+export default AnimatedGridBackground;
