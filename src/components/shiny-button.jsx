@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 export function ShinyButton({
   children,
   onClick,
@@ -19,7 +21,7 @@ export function ShinyButton({
 
   return (
     <>
-      <style jsx>{`
+      <style>{`
         @import url("https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,500&display=swap");
 
         @property --gradient-angle {
@@ -218,3 +220,19 @@ export function ShinyButton({
     </>
   );
 }
+
+ShinyButton.propTypes = {
+  children: PropTypes.node,
+  onClick: PropTypes.func,
+  className: PropTypes.string,
+  style: PropTypes.object,
+  type: PropTypes.string,
+};
+
+ShinyButton.defaultProps = {
+  children: null,
+  onClick: undefined,
+  className: "",
+  style: {},
+  type: "button",
+};

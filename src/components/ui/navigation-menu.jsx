@@ -1,4 +1,5 @@
 import * as React from "react"
+import PropTypes from "prop-types"
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu"
 import { cva } from "class-variance-authority"
 import { ChevronDown } from "lucide-react"
@@ -18,6 +19,10 @@ const NavigationMenu = React.forwardRef(({ className, children, ...props }, ref)
   </NavigationMenuPrimitive.Root>
 ))
 NavigationMenu.displayName = NavigationMenuPrimitive.Root.displayName
+NavigationMenu.propTypes = {
+  className: PropTypes.string,
+  children: PropTypes.node,
+}
 
 const NavigationMenuList = React.forwardRef(({ className, ...props }, ref) => (
   <NavigationMenuPrimitive.List
@@ -48,6 +53,10 @@ const NavigationMenuTrigger = React.forwardRef(({ className, children, ...props 
   </NavigationMenuPrimitive.Trigger>
 ))
 NavigationMenuTrigger.displayName = NavigationMenuPrimitive.Trigger.displayName
+NavigationMenuTrigger.propTypes = {
+  className: PropTypes.string,
+  children: PropTypes.node,
+}
 
 const NavigationMenuContent = React.forwardRef(({ className, ...props }, ref) => (
   <NavigationMenuPrimitive.Content
@@ -90,6 +99,10 @@ const NavigationMenuIndicator = React.forwardRef(({ className, ...props }, ref) 
 ))
 NavigationMenuIndicator.displayName =
   NavigationMenuPrimitive.Indicator.displayName
+NavigationMenuIndicator.propTypes = {
+  className: PropTypes.string,
+  children: PropTypes.node,
+}
 
 export {
   navigationMenuTriggerStyle,
