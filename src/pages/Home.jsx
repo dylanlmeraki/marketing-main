@@ -5,6 +5,7 @@ import { CheckCircle, FileText, ClipboardCheck, Shield, ArrowRight, Phone, Mail 
 import { ShinyButton } from "@/components/shiny-button";
 import { Card } from "@/components/ui/card";
 import { FlowButton } from "@/components/ui/FlowButton";
+import { Button } from "@/components/ui/button";
 import AnimatedSection from "@/components/AnimatedSection";
 import SEO from "@/components/SEO";
 import AnimatedGridBackground from "@/components/AnimatedGridBackground";
