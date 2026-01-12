@@ -2,14 +2,23 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { FileText, Shield, ArrowRight, Check, Droplets, ClipboardCheck, Users, Zap, CheckCircle, Info, Plus, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ShinyButton } from "@/components/shiny-button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import AnimatedSection from "../components/AnimatedSection";
 import SEO from "@/components/SEO";
+import AnimatedGridBackground from "@/components/AnimatedGridBackground";
 
 export default function Services() {
   const [isInfoExpanded, setIsInfoExpanded] = useState(false);
+  const consultationShinyVars = {
+    "--shiny-cta-bg": "#0ea5e9",
+    "--shiny-cta-bg-subtle": "rgba(14, 165, 233, 0.2)",
+    "--shiny-cta-highlight": "#2563eb",
+    "--shiny-cta-highlight-subtle": "#38bdf8",
+    "--shiny-cta-shadow": "rgba(59, 130, 246, 0.4)",
+    "--shiny-cta-glow": "rgba(56, 189, 248, 0.55)",
+  };
   
   return (
     <div className="min-h-screen bg-slate-50">
@@ -25,6 +34,11 @@ export default function Services() {
         <div className="absolute inset-0 opacity-50">
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1600')] bg-cover bg-center" />
           <div className="absolute inset-0 bg-slate-900/60 mix-blend-multiply"></div>
+        </div>
+
+        {/* Animated grid overlay (above cover image, below content) */}
+        <div className="absolute inset-0 opacity-50 pointer-events-none">
+          <AnimatedGridBackground />
         </div>
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/grid-me.png')] opacity-10 pointer-events-none"></div>
         
@@ -150,10 +164,13 @@ export default function Services() {
 
                   <div className="flex justify-center mt-8">
                     <Link to={createPageUrl("Consultation")}>
-                      <Button size="lg" className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-10 py-7 text-lg font-bold tracking-tight rounded-md shadow-lg hover:shadow-xl hover:shadow-blue-500/50 hover:-translate-y-1 active:scale-95 transition-all duration-300 group">
+                      <ShinyButton
+                        className="group inline-flex items-center justify-center gap-2 whitespace-nowrap text-white font-bold tracking-tight text-lg px-10 py-7 rounded-md shadow-lg hover:shadow-blue-500/60 hover:-translate-y-1 active:scale-95 transition-all duration-300"
+                        style={consultationShinyVars}
+                      >
                         Start Your SWPPP
                         <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-                      </Button>
+                      </ShinyButton>
                     </Link>
                   </div>
                 </div>
@@ -217,10 +234,13 @@ export default function Services() {
 
                   <div className="flex justify-center mt-8">
                     <Link to={createPageUrl("Consultation")}>
-                      <Button size="lg" className="bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700 text-white px-10 py-7 text-lg font-bold tracking-tight rounded-md shadow-lg hover:shadow-xl hover:shadow-cyan-500/50 hover:-translate-y-1 active:scale-95 transition-all duration-300 group">
+                      <ShinyButton
+                        className="group inline-flex items-center justify-center gap-2 whitespace-nowrap text-white font-bold tracking-tight text-lg px-10 py-7 rounded-md shadow-lg hover:shadow-cyan-500/50 hover:-translate-y-1 active:scale-95 transition-all duration-300"
+                        style={consultationShinyVars}
+                      >
                         Get Your SWPPP
                         <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-                      </Button>
+                      </ShinyButton>
                     </Link>
                   </div>
                 </div>
@@ -353,10 +373,13 @@ export default function Services() {
             
         <div className="flex justify-center mt-8">
           <Link to={createPageUrl("Consultation")}>
-            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-10 py-7 text-lg font-bold tracking-tight rounded-md shadow-lg hover:shadow-xl hover:shadow-blue-500/50 hover:-translate-y-1 active:scale-95 transition-all duration-300 group">
-                Get a Consultation
+            <ShinyButton
+              className="group inline-flex items-center justify-center gap-2 whitespace-nowrap text-white font-bold tracking-tight text-lg px-10 py-7 rounded-md shadow-lg hover:shadow-blue-500/60 hover:-translate-y-1 active:scale-95 transition-all duration-300"
+              style={consultationShinyVars}
+            >
+              Get a Consultation
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-            </Button>
+            </ShinyButton>
           </Link>
         </div>
           </AnimatedSection>

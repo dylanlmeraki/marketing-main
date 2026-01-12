@@ -3,9 +3,11 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Beaker, CheckCircle, Droplets, FlaskConical, ArrowRight, Target, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ShinyButton } from "@/components/shiny-button";
 import { Card } from "@/components/ui/card";
 import AnimatedSection from "@/components/AnimatedSection";
 import SEO from "@/components/SEO";
+import AnimatedGridBackground from "@/components/AnimatedGridBackground";
 
 export default function InspectionsTesting() {
   return (
@@ -21,6 +23,11 @@ export default function InspectionsTesting() {
         <div className="absolute inset-0 opacity-50">
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1600')] bg-cover bg-center" />
           <div className="absolute inset-0 bg-slate-900/60 mix-blend-multiply"></div>
+        </div>
+
+        {/* Animated grid overlay (above cover image, below content) */}
+        <div className="absolute inset-0 opacity-50 pointer-events-none">
+          <AnimatedGridBackground />
         </div>
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/grid-me.png')] opacity-10 pointer-events-none"></div>
         
@@ -260,10 +267,21 @@ export default function InspectionsTesting() {
               We have you covered - from stormwater compliance, engineered structural materials verification, or environmental analysis and assessments.
             </p>
             <Link to={createPageUrl("Consultation")}>
-              <Button size="lg" className="bg-white text-blue-600 hover:bg-gradient-to-r hover:from-white hover:to-blue-50 px-10 py-7 text-lg font-bold tracking-tight rounded-md shadow-xl hover:shadow-2xl hover:-translate-y-1 active:scale-95 transition-all duration-300 group">
+              <ShinyButton
+                className="group inline-flex items-center justify-center gap-2 whitespace-nowrap text-blue-900 font-bold tracking-tight text-lg px-10 py-7 rounded-md shadow-xl hover:shadow-blue-500/30 hover:-translate-y-1 active:scale-95 transition-all duration-300 bg-white"
+                style={{
+                  "--shiny-cta-bg": "#ffffff",
+                  "--shiny-cta-bg-subtle": "rgba(191, 219, 254, 0.5)",
+                  "--shiny-cta-fg": "#0f172a",
+                  "--shiny-cta-highlight": "#2563eb",
+                  "--shiny-cta-highlight-subtle": "#93c5fd",
+                  "--shiny-cta-shadow": "rgba(59, 130, 246, 0.35)",
+                  "--shiny-cta-glow": "rgba(59, 130, 246, 0.45)",
+                }}
+              >
                 Begin Inspections Consultation
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-              </Button>
+              </ShinyButton>
             </Link>
           </AnimatedSection>
         </div>

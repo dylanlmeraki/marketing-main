@@ -2,10 +2,12 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { CheckCircle, FileText, ClipboardCheck, Shield, ArrowRight, Phone, Mail } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ShinyButton } from "@/components/shiny-button";
 import { Card } from "@/components/ui/card";
+import { FlowButton } from "@/components/ui/FlowButton";
 import AnimatedSection from "@/components/AnimatedSection";
 import SEO from "@/components/SEO";
+import AnimatedGridBackground from "@/components/AnimatedGridBackground";
 
 export default function Home() {
   return (
@@ -19,13 +21,30 @@ export default function Home() {
       
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-slate-900">
-        <div className="absolute inset-0 opacity-60">
+        <div className="absolute inset-0 opacity-50">
           <div className="absolute inset-0 bg-[url('https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68eb69c51ce08e4c9fdca015/3778041a3_Bay_Area_Evening_Cityscape.jpg')] bg-cover bg-center" />
           <div className="absolute inset-0 bg-slate-900/60 mix-blend-multiply"></div>
         </div>
-        
-        {/* Rigid Grid Overlay */}
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/grid-me.png')] opacity-20 pointer-events-none"></div>
+
+        {/* Animated grid overlay (above cover image, below content) */}
+        <AnimatedGridBackground 
+          baseOpacity={0.6}
+          triggerInterval={300}
+          animationDuration={2500}
+          zIndex={2}
+          className="mix-blend-screen"
+        />
+        <AnimatedGridBackground 
+          gridSize={80}
+          animationDuration={4200}
+          triggerInterval={650}
+          offsetX={12}
+          offsetY={8}
+          baseOpacity={0.4}
+          zIndex={3}
+          movingOffset
+          className="mix-blend-screen"
+        />
 
         <div className="text-center relative z-10 max-w-7xl px-4 w-full">
           <AnimatedSection direction="up" duration={0.8} className="bg-slate-900/80 mx-auto opacity-100 rounded-md backdrop-blur-sm max-w-6xl shadow-2xl border-t-4 border-blue-600">
@@ -34,8 +53,8 @@ export default function Home() {
                 Pacific Engineering <br/>
                 <span className="text-blue-500">& Construction Inc.</span>
               </h1>
-              
-              <div className="w-24 h-1 bg-blue-500 mx-auto mb-8"></div>
+
+              <div className="w-40 h-1 bg-blue-500 mx-auto mb-8"></div>
 
               <div className="mb-12">
                 <p className="text-gray-300 mb-4 mx-auto text-xl leading-relaxed md:text-2xl max-w-4xl font-light">
@@ -45,16 +64,23 @@ export default function Home() {
 
               <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
                 <Link to={createPageUrl("ServicesOverview")}>
-                  <Button size="lg" variant="outline" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-slate-900 px-10 py-7 text-lg font-bold tracking-tight rounded-md inline-flex items-center justify-center gap-2 whitespace-nowrap transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 active:scale-95 group">
-                    Our Services
-                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-                  </Button>
+                  <FlowButton className="mt-1" text="Our Services" />
                 </Link>
                 <Link to={createPageUrl("Consultation")}>
-                  <Button size="lg" className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-10 py-7 text-lg font-bold tracking-tight rounded-md inline-flex items-center justify-center gap-2 whitespace-nowrap transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/50 hover:-translate-y-1 active:scale-95 group">
+                  <ShinyButton
+                    className="group inline-flex items-center justify-center gap-2 whitespace-nowrap text-white font-bold tracking-tight text-lg px-10 py-7 rounded-md shadow-lg hover:shadow-blue-500/60 hover:-translate-y-1 active:scale-95 transition-all duration-300"
+                    style={{
+                      "--shiny-cta-bg": "#0ea5e9",
+                      "--shiny-cta-bg-subtle": "rgba(14, 165, 233, 0.2)",
+                      "--shiny-cta-highlight": "#2563eb",
+                      "--shiny-cta-highlight-subtle": "#38bdf8",
+                      "--shiny-cta-shadow": "rgba(59, 130, 246, 0.4)",
+                      "--shiny-cta-glow": "rgba(56, 189, 248, 0.55)",
+                    }}
+                  >
                     Free Consultation
                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-                  </Button>
+                  </ShinyButton>
                 </Link>
               </div>
 
@@ -84,7 +110,7 @@ export default function Home() {
             <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6 tracking-tight">
               Consulting Engineers & Contractors
             </h2>
-            <div className="w-16 h-1 bg-blue-600 mx-auto mb-8"></div>
+            <div className="w-40 h-1 bg-blue-600 mx-auto mb-8"></div>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">Full-scale civil and structural engineering and construction plans developed and implemented by our teams of in-house Engineers, QSD/QSPs, and construction experts.
 
             Helping you ensure on-time, on budget, full compliance, and with maximum creative outlook for your project.

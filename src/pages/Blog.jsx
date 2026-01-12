@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import AnimatedSection from "@/components/AnimatedSection";
+import AnimatedGridBackground from "@/components/AnimatedGridBackground";
 
 export default function Blog() {
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -86,6 +87,11 @@ export default function Blog() {
         <div className="absolute inset-0 opacity-50">
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1600')] bg-cover bg-center" />
           <div className="absolute inset-0 bg-slate-900/60 mix-blend-multiply"></div>
+        </div>
+
+        {/* Animated grid overlay (above cover image, below content) */}
+        <div className="absolute inset-0 opacity-50 pointer-events-none">
+          <AnimatedGridBackground />
         </div>
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/grid-me.png')] opacity-10 pointer-events-none"></div>
         

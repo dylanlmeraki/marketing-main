@@ -11,6 +11,7 @@ import AnimatedSection from "@/components/AnimatedSection";
 import SmartFormInput from "../components/SmartFormInput";
 import ServiceSuggester from "../components/ServiceSuggester";
 import SEO from "@/components/SEO";
+import AnimatedGridBackground from "@/components/AnimatedGridBackground";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -317,6 +318,11 @@ ${formData.message}${filesSection}`;
         <div className="absolute inset-0 opacity-50">
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1600')] bg-cover bg-center" />
           <div className="absolute inset-0 bg-slate-900/60 mix-blend-multiply"></div>
+        </div>
+
+        {/* Animated grid overlay (above cover image, below content) */}
+        <div className="absolute inset-0 opacity-50 pointer-events-none">
+          <AnimatedGridBackground />
         </div>
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/grid-me.png')] opacity-10 pointer-events-none"></div>
         

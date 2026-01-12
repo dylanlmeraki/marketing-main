@@ -14,10 +14,12 @@ import {
   CheckCircle } from
 "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ShinyButton } from "@/components/shiny-button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import AnimatedSection from "@/components/AnimatedSection";
 import SEO from "@/components/SEO";
+import AnimatedGridBackground from "@/components/AnimatedGridBackground";
 
 export default function ServicesOverview() {
   // ============================================================
@@ -120,6 +122,11 @@ export default function ServicesOverview() {
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1600')] bg-cover bg-center" />
           <div className="absolute inset-0 bg-slate-900/60 mix-blend-multiply"></div>
         </div>    
+
+        {/* Animated grid overlay (above cover image, below content) */}
+        <div className="absolute inset-0 opacity-50 pointer-events-none">
+          <AnimatedGridBackground />
+        </div>
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/grid-me.png')] opacity-10 pointer-events-none"></div>
 
         <div className="relative z-10 max-w-5xl mx-auto text-center">
@@ -363,10 +370,20 @@ export default function ServicesOverview() {
               </Link>
               
               <Link to={createPageUrl("Consultation")}>
-                <Button size="lg" className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white border-0 font-bold tracking-tight px-10 py-7 text-lg rounded-md shadow-lg hover:shadow-xl hover:shadow-blue-500/50 active:scale-95 transition-all duration-300 group">
+                <ShinyButton
+                  className="group inline-flex items-center justify-center gap-2 whitespace-nowrap text-white font-bold tracking-tight text-lg px-10 py-7 rounded-md shadow-lg hover:shadow-blue-500/60 hover:-translate-y-1 active:scale-95 transition-all duration-300"
+                  style={{
+                    "--shiny-cta-bg": "#0ea5e9",
+                    "--shiny-cta-bg-subtle": "rgba(14, 165, 233, 0.2)",
+                    "--shiny-cta-highlight": "#2563eb",
+                    "--shiny-cta-highlight-subtle": "#38bdf8",
+                    "--shiny-cta-shadow": "rgba(59, 130, 246, 0.4)",
+                    "--shiny-cta-glow": "rgba(56, 189, 248, 0.55)",
+                  }}
+                >
                   Get Free Consultation
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-                </Button>
+                </ShinyButton>
               </Link>
             </div>
           </AnimatedSection>

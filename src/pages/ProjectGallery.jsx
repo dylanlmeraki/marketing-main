@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import AnimatedSection from "@/components/AnimatedSection";
 import SEO from "@/components/SEO";
 import { projects, getUniqueCategories, getUniqueServices, getUniqueCounties } from "@/components/data/projectsData";
+import AnimatedGridBackground from "@/components/AnimatedGridBackground";
 
 export default function ProjectGallery() {
   const [filters, setFilters] = useState({
@@ -56,6 +57,11 @@ export default function ProjectGallery() {
         <div className="absolute inset-0 opacity-50">
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1600')] bg-cover bg-center" />
           <div className="absolute inset-0 bg-slate-900/60 mix-blend-multiply"></div>
+        </div>
+
+        {/* Animated grid overlay (above cover image, below content) */}
+        <div className="absolute inset-0 opacity-50 pointer-events-none">
+          <AnimatedGridBackground />
         </div>
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/grid-me.png')] opacity-10 pointer-events-none"></div>
         
