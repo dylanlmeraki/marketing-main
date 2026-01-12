@@ -14,4 +14,3 @@
     }
   },
   "required": ["name", "email"]
-}
